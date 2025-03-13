@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    NewsListView, NewsDetailView, LikeNewsView, NewsByTagView, NewsStatsView
+    NewsListView, NewsDetailView, LikeNewsView, NewsByTagView, NewsStatsView, register_view, login_view, logout_view
 )
 from django.shortcuts import render
 from .models import News, Tag
