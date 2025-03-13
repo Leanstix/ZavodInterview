@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}News by Tag{% endblock %}
+
+{% block content %}
+    <h1>News tagged "{{ tag.name }}"</h1>
+    {% for news in news_list %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><a href="{% url 'news-detail' news.id %}">{{ news.title }}</a></h5>
+                <p class="card-text">{{ news.text|truncatechars:150 }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p>No news found for this tag.</p>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}News Statistics{% endblock %}
+
+{% block content %}
+    <h1>News Views Statistics</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Views</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for news in news_list %}
+                <tr>
+                    <td><a href="{% url 'news-detail' news.id %}">{{ news.title }}</a></td>
+                    <td>{{ news.views }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

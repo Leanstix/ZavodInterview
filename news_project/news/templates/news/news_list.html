@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}News List{% endblock %}
+
+{% block content %}
+    <h1>News List</h1>
+    <div id="news-container">
+        {% for news in news_list %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'news-detail' news.id %}">{{ news.title }}</a></h5>
+                    <p class="card-text">{{ news.text|truncatechars:150 }}</p>
+                    <p><strong>Tags:</strong> {% for tag in news.tags.all %}{{ tag.name }} {% endfor %}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        let page = 1;
+        window.onscroll = function() {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+                page++;
+                fetch(`/news/?page=${page}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        let newsContainer = document.getElementById("news-container");
+                        data.results.forEach(news => {
+                            let div = document.createElement("div");
+                            div.classList.add("card", "mb-3");
+                            div.innerHTML = `<div class="card-body">
+                                <h5 class="card-title"><a href="/news/${news.id}/">${news.title}</a></h5>
+                                <p class="card-text">${news.text.substring(0, 150)}...</p>
+                            </div>`;
+                            newsContainer.appendChild(div);
+                        });
+                    });
+            }
+        };
+    </script>
+{% endblock %}
