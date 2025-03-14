@@ -43,9 +43,30 @@ def news_detail_view(request, pk):
     return render(request, 'news/news_detail.html', {'news': news})
 
 def news_by_tag_view(request, tag_id):
-    tag = Tag.objects.get(id=tag_id)
-    news_list = tag.news.all()
-    return render(request, 'news/news_by_tag.html', {'news_list': news_list, 'tag': tag})
+    tag = get_object_or_404(Tag, id=tag_id)
+    page = int(request.GET.get('page', 1))
+    per_page = 5 if page == 1 else 3  # First load: 5, then 3 per scroll
+    
+    news_list = tag.news.all().order_by('-created_at')
+    paginator = Paginator(news_list, per_page)
+
+    try:
+        news_page = paginator.page(page)
+    except:
+        return JsonResponse({'news': []})  # Return empty list if out of range
+
+    news_data = [
+        {
+            'id': news.id,
+            'title': news.title,
+            'text': news.text[:150] + "...",
+        } for news in news_page
+    ]
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  # Detect AJAX
+        return JsonResponse({'news': news_data})
+
+    return render(request, 'news/news_by_tag.html', {'tag': tag, 'news_list': news_data})
 
 def news_stats_view(request):
     news_list = News.objects.all().order_by('-views')

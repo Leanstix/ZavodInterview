@@ -12,8 +12,8 @@
                     </h5>
                     <p class="card-text">{{ news.text|truncatechars:150 }}</p>
                     <p><strong>Tags:</strong>  
-                        {% for tag in news.tags %}
-                            <span class="badge bg-primary">{{ tag }}</span>
+                        {% for tag in news.tags.all %}
+                            <a href="{% url 'news_by_tag' tag.id %}" class="badge bg-primary text-decoration-none">{{ tag.name }}</a>
                         {% empty %}
                             <span class="text-muted">No tags</span>
                         {% endfor %}
