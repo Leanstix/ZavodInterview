@@ -12,7 +12,7 @@
             <a class="navbar-brand" href="{% url 'news-list' %}">News App</a>
             <div>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+                <button onclick="logoutUser()" class="btn btn-outline-danger">Logout</button>
                 {% else %}
                     <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
                 {% endif %}
@@ -83,6 +83,32 @@
                 document.getElementById("loginError").innerText = "An error occurred. Please try again.";
             });
         });
+    </script>
+    <script>
+        function logoutUser() {
+            if (!localStorage.getItem("token")) {
+                window.location.reload();  
+                return;
+            }
+    
+            fetch("{% url 'logout' %}", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Token " + localStorage.getItem("token"),
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            }).then(response => {
+                if (response.ok) {
+                    localStorage.removeItem("token"); 
+                    window.location.reload(); 
+                } else {
+                    alert("Error logging out. Please try again.");
+                }
+            }).catch(error => {
+                alert("Logout failed. Check your network and try again.");
+            });
+        }
     </script>
 </body>
 </html>
