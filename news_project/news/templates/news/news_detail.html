@@ -19,7 +19,7 @@
 
     <script>
         function toggleLike(newsId) {
-            fetch(`/news/${newsId}/like/`, {
+            fetch(`/api/news/${newsId}/like/`, {
                 method: "POST",
                 headers: {
                     "Authorization": "Token " + localStorage.getItem("token"),
