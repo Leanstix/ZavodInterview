@@ -6,12 +6,35 @@ from .views import (
 from django.shortcuts import render
 from .models import News, Tag
 
-# Function-based views for HTML pages
-from .models import News
+from django.core.paginator import Paginator
+from django.http import JsonResponse
 
 def news_list_view(request):
-    news_list = News.objects.prefetch_related('tags').all().order_by('-created_at')
-    return render(request, 'news/news_list.html', {'news_list': news_list})
+    page = int(request.GET.get('page', 1))
+    per_page = 5 if page == 1 else 3  # First load: 5, subsequent: 3
+    
+    news_list = News.objects.all().order_by('-created_at')
+    paginator = Paginator(news_list, per_page)
+
+    try:
+        news_page = paginator.page(page)
+    except:
+        return JsonResponse({'news': []})  # Return empty list if out of range
+
+    news_data = [
+        {
+            'id': news.id,
+            'title': news.title,
+            'text': news.text[:150] + "...",
+            'tags': [tag.name for tag in news.tags.all()]
+        } for news in news_page
+    ]
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  # AJAX request
+        return JsonResponse({'news': news_data})
+
+    # Normal page load: Pass only the first 5 news to template
+    return render(request, 'news/news_list.html', {'news_list': news_data})
 
 def news_detail_view(request, pk):
     news = News.objects.get(pk=pk)

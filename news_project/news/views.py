@@ -5,7 +5,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import News, Like
 from .serializers import NewsSerializer, LikeSerializer, TagSerializer
 
@@ -24,7 +24,7 @@ class NewsDetailView(generics.RetrieveAPIView):
         return super().retrieve(request, *args, **kwargs)
 
 class LikeNewsView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, news_id):
         news = get_object_or_404(News, id=news_id)
@@ -51,13 +51,13 @@ class RegisterView(APIView):
 class NewsListCreateView(generics.ListCreateAPIView):
     queryset = News.objects.all().order_by('-created_at')
     serializer_class = NewsSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]  # Allow read-only access for unauthenticated users
+    permission_classes = [IsAuthenticatedOrReadOnly]  # Allow read-only access for unauthenticated users
 
     def perform_create(self, serializer):
         serializer.save()
 
 class NewsDeleteView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAdminUser]  # Only admins can delete news
 
     def delete(self, request, news_id):
         news = get_object_or_404(News, id=news_id)
@@ -82,7 +82,7 @@ class LoginView(APIView):
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class LogoutView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         request.user.auth_token.delete()  # Delete user's token
