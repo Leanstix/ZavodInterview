@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import News, Like
 from .serializers import NewsSerializer, LikeSerializer, TagSerializer
+from django.shortcuts import render
 
 class NewsListView(generics.ListAPIView):
     queryset = News.objects.all().order_by('-created_at')
@@ -24,14 +25,22 @@ class NewsDetailView(generics.RetrieveAPIView):
         return super().retrieve(request, *args, **kwargs)
 
 class LikeNewsView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, news_id):
         news = get_object_or_404(News, id=news_id)
         like, created = Like.objects.get_or_create(user=request.user, news=news)
-        like.is_like = not like.is_like  # Toggle like/dislike
+
+        if created:
+            like.is_like = True 
+        else:
+            like.is_like = not like.is_like 
+
         like.save()
-        return Response({'likes': news.like_set.filter(is_like=True).count()})
+
+        like_count = news.like_set.filter(is_like=True).count() 
+
+        return Response({'likes': like_count, 'liked': like.is_like}, status=status.HTTP_200_OK)
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -51,13 +60,13 @@ class RegisterView(APIView):
 class NewsListCreateView(generics.ListCreateAPIView):
     queryset = News.objects.all().order_by('-created_at')
     serializer_class = NewsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]  # Allow read-only access for unauthenticated users
+    permission_classes = [IsAuthenticatedOrReadOnly]  
 
     def perform_create(self, serializer):
         serializer.save()
 
 class NewsDeleteView(APIView):
-    permission_classes = [IsAdminUser]  # Only admins can delete news
+    permission_classes = [IsAdminUser] 
 
     def delete(self, request, news_id):
         news = get_object_or_404(News, id=news_id)
@@ -85,6 +94,6 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        request.user.auth_token.delete()  # Delete user's token
+        request.user.auth_token.delete() 
         logout(request)
         return Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)

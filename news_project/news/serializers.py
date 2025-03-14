@@ -18,7 +18,7 @@ class NewsSerializer(serializers.ModelSerializer):
         return obj.like_set.filter(is_like=True).count()
 
 class LikeSerializer(serializers.ModelSerializer):
-    user = serializers.ReadOnlyField(source='user.username')  # Show username instead of ID
+    user = serializers.ReadOnlyField(source='user.username') 
 
     class Meta:
         model = Like

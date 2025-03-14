@@ -4,7 +4,7 @@ from django.db import models
 class News(models.Model):
     title = models.CharField(max_length=255)
     text = models.TextField()
-    image = models.ImageField(upload_to='http://127.0.0.1:8000/news_images/', blank=True, null=True)
+    image = models.ImageField(upload_to='http://127.0.0.1:8000/media/news_images/', blank=True, null=True)
     tags = models.ManyToManyField('Tag', related_name='news')
     created_at = models.DateTimeField(auto_now_add=True)
     views = models.IntegerField(default=0)
