@@ -92,7 +92,7 @@ urlpatterns = [
     path('news/stats/', news_stats_view, name='news-stats'),
 
     # API views
-    path('api/news/', NewsListView.as_view(), name='news-api-list'),
+    
     path('api/news/<int:pk>/', NewsDetailView.as_view(), name='news-api-detail'),
     path('api/news/<int:news_id>/like/', LikeNewsView.as_view(), name='like-news'),
     path('api/news/', NewsListCreateView.as_view(), name='news-list-create'),
