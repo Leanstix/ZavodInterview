@@ -1,16 +1,53 @@
 {% extends 'news/base.html' %}
-{% block title %}News by Tag{% endblock %}
+{% block title %}News tagged "{{ tag.name }}"{% endblock %}
 
 {% block content %}
     <h1>News tagged "{{ tag.name }}"</h1>
-    {% for news in news_list %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title"><a href="{% url 'news-detail' news.id %}">{{ news.title }}</a></h5>
-                <p class="card-text">{{ news.text|truncatechars:150 }}</p>
+    <div id="news-container">
+        {% for news in news_list %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'news-detail' news.id %}">{{ news.title }}</a>
+                    </h5>
+                    <p class="card-text">{{ news.text|truncatechars:150 }}</p>
+                </div>
             </div>
-        </div>
-    {% empty %}
-        <p>No news found for this tag.</p>
-    {% endfor %}
+        {% empty %}
+            <p>No news found for this tag.</p>
+        {% endfor %}
+    </div>
+
+    <script>
+        let page = 2;  // Start from page 2 since page 1 loads first 5 news
+        let isLoading = false;
+
+        window.addEventListener("scroll", () => {
+            if (isLoading) return;
+
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
+                isLoading = true;
+                fetch(`/news/tag/{{ tag.id }}/?page=${page}`, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.news.length === 0) return;
+
+                        let newsContainer = document.getElementById("news-container");
+                        data.news.forEach(news => {
+                            let div = document.createElement("div");
+                            div.classList.add("card", "mb-3");
+                            div.innerHTML = `
+                                <div class="card-body">
+                                    <h5 class="card-title"><a href="/news/${news.id}/">${news.title}</a></h5>
+                                    <p class="card-text">${news.text}</p>
+                                </div>`;
+                            newsContainer.appendChild(div);
+                        });
+
+                        page++;
+                        isLoading = false;
+                    });
+            }
+        });
+    </script>
 {% endblock %}
