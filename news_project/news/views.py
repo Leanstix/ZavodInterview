@@ -48,6 +48,22 @@ class RegisterView(APIView):
 
         return Response({'token': token.key}, status=status.HTTP_201_CREATED)
 
+class NewsListCreateView(generics.ListCreateAPIView):
+    queryset = News.objects.all().order_by('-created_at')
+    serializer_class = NewsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]  # Allow read-only access for unauthenticated users
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+class NewsDeleteView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, news_id):
+        news = get_object_or_404(News, id=news_id)
+        news.delete()
+        return Response({"message": "News deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
