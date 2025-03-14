@@ -7,7 +7,7 @@ from .models import News, Tag
 
 # Function-based views for HTML pages
 def news_list_view(request):
-    return render(request, '/news/news_list.html', {'news_list': News.objects.all()})
+    return render(request, 'news/news_list.html', {'news_list': 'news_list'})
 
 def news_detail_view(request, pk):
     news = News.objects.get(pk=pk)
