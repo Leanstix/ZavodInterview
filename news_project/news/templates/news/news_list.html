@@ -7,7 +7,13 @@
         {% for news in news_list %}
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title"><a href="{% url 'news-detail' news.id %}">{{ news.title }}</a></h5>
+                    <h5 class="card-title">
+                        {% if news.id %}
+                            <a href="{% url 'news-detail' news.id %}">{{ news.title }}</a>
+                        {% else %}
+                            {{ news.title }}
+                        {% endif %}
+                    </h5>
                     <p class="card-text">{{ news.text|truncatechars:150 }}</p>
                     <p><strong>Tags:</strong> {% for tag in news.tags.all %}{{ tag.name }} {% endfor %}</p>
                 </div>
