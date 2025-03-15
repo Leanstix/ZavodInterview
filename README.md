@@ -121,4 +121,4 @@ This project is licensed under the **MIT License**.
 
 ## 💡 Contributors
 🚀 Developed by Aleshinloye Olamilekan  
-🔗 GitHub: [Your GitHub Profile](https://github.com/Leanstix)  
+🔗 GitHub: [Aleshinloy Olamilekan](https://github.com/Leanstix)  
