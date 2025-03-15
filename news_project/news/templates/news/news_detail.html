@@ -32,7 +32,8 @@
 
     <script>
         let newsId = {{ news.id }};
-    
+        let likeCountSpan = document.getElementById("like-count");
+        
         function fetchLikeCount() {
             if (localStorage.getItem("token")) {
                 fetch(`/api/news/${newsId}/like/`, {
@@ -43,12 +44,14 @@
                     }
                 }).then(response => response.json())
                   .then(data => {
-                      document.getElementById("like-count").innerText = data.likes;  
+                      likeCountSpan.innerText = data.likes !== undefined ? data.likes : {{ like_count }};
                       let likeButton = document.getElementById("like-button");
                       likeButton.innerText = data.liked ? "Unlike" : "Like";
                       likeButton.classList.toggle("btn-danger", data.liked);
                   })
                   .catch(error => console.error("Error fetching like count:", error));
+            } else {
+                likeCountSpan.innerText = {{ like_count }};
             }
         }
     
@@ -66,14 +69,13 @@
                 }
             }).then(response => response.json())
               .then(data => {
-                  document.getElementById("like-count").innerText = data.likes;  
+                  likeCountSpan.innerText = data.likes !== undefined ? data.likes : {{ like_count }};
                   let likeButton = document.getElementById("like-button");
                   likeButton.innerText = data.liked ? "Unlike" : "Like";
-                  likeButton.classList.toggle("btn-danger", data.liked); 
+                  likeButton.classList.toggle("btn-danger", data.liked);
               }).catch(error => alert("Error updating like status. Please try again."));
         }
     
-       
         document.addEventListener("DOMContentLoaded", fetchLikeCount);
     </script>
 {% endblock %}

@@ -11,7 +11,7 @@ from .serializers import NewsSerializer, LikeSerializer, TagSerializer
 from django.shortcuts import render
 
 class NewsListView(generics.ListAPIView):
-    queryset = News.objects.all().order_by('-created_at')
+    queryset = News.objects.all().order_by('-created_at')[:5]
     serializer_class = NewsSerializer
 
 class NewsDetailView(generics.RetrieveAPIView):

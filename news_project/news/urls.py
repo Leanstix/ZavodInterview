@@ -11,30 +11,27 @@ from django.http import JsonResponse
 from django.db.models import Count
 
 def news_list_view(request):
-    page = int(request.GET.get('page', 1))
-    per_page = 5 if page == 1 else 3 
-    
-    news_list = News.objects.prefetch_related('tags').all().order_by('-created_at')
-    paginator = Paginator(news_list, per_page)
+    last_news_id = request.GET.get('last_news_id')
+    is_admin = request.user.is_authenticated and request.user.is_staff  # Check if user is an admin
 
-    try:
-        news_page = paginator.page(page)
-    except:
-        return JsonResponse({'news': []})  
+    if last_news_id:
+        news_list = News.objects.filter(id__lt=last_news_id).order_by('-created_at')[:3]
+    else:
+        news_list = News.objects.all().order_by('-created_at')[:5]
 
     news_data = [
         {
             'id': news.id,
             'title': news.title,
             'text': news.text[:150] + "...",
-            'tags': [{'id': tag.id, 'name': tag.name} for tag in news.tags.all()] 
-        } for news in news_page
+            'tags': [{'id': tag.id, 'name': tag.name} for tag in news.tags.all()]
+        } for news in news_list
     ]
 
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  
-        return JsonResponse({'news': news_data})
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'news': news_data, 'is_admin': is_admin})  # Include is_admin
 
-    return render(request, 'news/news_list.html', {'news_list': news_list})  
+    return render(request, 'news/news_list.html', {'news_list': news_list, 'is_admin': is_admin})
 
 def register_view(request):
     return render(request, 'news/register.html')
