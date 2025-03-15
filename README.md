@@ -22,6 +22,7 @@ It supports **infinite scrolling**, **tag-based filtering**, **user authenticati
 ```sh
 git https://github.com/Leanstix/ZavodInterview.git
 cd ZavodInterview
+cd news_project
 ```
 
 ### 2️⃣ Create & Activate a Virtual Environment
